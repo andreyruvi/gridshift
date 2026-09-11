@@ -1,0 +1,16 @@
+{
+  "name": "gridshift",
+  "short_name": "gridshift",
+  "description": "A sliding-tile puzzle with variable board sizes, undo, seeded daily boards, and full keyboard and screen-reader support.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#111720",
+  "theme_color": "#111720",
+  "categories": ["games", "puzzle"],
+  "icons": [
+    { "src": "./icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

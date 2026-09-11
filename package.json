@@ -1,0 +1,16 @@
+{
+  "name": "gridshift",
+  "version": "1.0.0",
+  "description": "A sliding-tile puzzle with variable board sizes, undo, seeded daily boards, and full keyboard and screen-reader support.",
+  "type": "module",
+  "license": "MIT",
+  "private": false,
+  "homepage": "https://andreyruvi.github.io/gridshift/",
+  "repository": { "type": "git", "url": "https://github.com/andreyruvi/gridshift.git" },
+  "keywords": ["game", "puzzle", "sliding-tile", "2048", "pwa", "accessibility", "vanilla-js"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\"",
+    "serve": "python3 -m http.server 8000"
+  }
+}

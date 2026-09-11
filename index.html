@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>gridshift — a sliding-tile puzzle</title>
+<meta name="description" content="A sliding-tile puzzle with variable board sizes, undo, seeded daily boards, and full keyboard and screen-reader support.">
+<meta name="theme-color" content="#111720" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./styles/gridshift.css">
+</head>
+<body>
+<a class="skip" href="#board">Skip to the board</a>
+
+<div class="shell">
+  <header class="masthead">
+    <div class="brand">
+      <h1>gridshift</h1>
+      <p class="tagline">Slide, merge, and keep going.</p>
+    </div>
+    <div class="readouts">
+      <div class="readout"><span class="readout-key">Score</span><span class="readout-value" id="score">0</span></div>
+      <div class="readout"><span class="readout-key">Best</span><span class="readout-value" id="best">0</span></div>
+      <div class="readout"><span class="readout-key">Moves</span><span class="readout-value" id="moves">0</span></div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="field">
+      <label for="size">Board</label>
+      <select id="size"></select>
+    </div>
+    <div class="field">
+      <label for="mode">Mode</label>
+      <select id="mode">
+        <option value="free">Free play</option>
+        <option value="daily">Daily board</option>
+      </select>
+    </div>
+    <button type="button" id="undo" class="btn">Undo</button>
+    <button type="button" id="restart" class="btn btn-primary">New game</button>
+    <p class="seed" id="seed-label">Free play</p>
+  </div>
+
+  <p class="notice" id="persistence" hidden>
+    This browser is blocking site storage, so scores and statistics will not be kept after you close the tab.
+  </p>
+
+  <div class="board-wrap">
+    <div class="board" id="board" tabindex="0" role="application"
+         aria-label="Game board. Use the arrow keys to slide tiles. The result of each move is announced, and a readable copy of the board follows it.">
+      <div class="cells" data-cells aria-hidden="true"></div>
+      <div class="tiles" data-tiles></div>
+    </div>
+
+    <div class="overlay" id="overlay" hidden role="alertdialog" aria-modal="true"
+         aria-labelledby="overlay-title" aria-describedby="overlay-text">
+      <div class="overlay-card">
+        <h2 id="overlay-title">Game over</h2>
+        <p id="overlay-text"></p>
+        <div class="overlay-actions">
+          <button type="button" id="keep-playing" class="btn btn-primary">Keep playing</button>
+          <button type="button" id="overlay-restart" class="btn">New game</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p id="live" class="sr-only" role="status" aria-live="polite"></p>
+  <div id="board-table" class="sr-only"></div>
+
+  <section class="panel" aria-labelledby="stats-heading">
+    <h2 id="stats-heading">Your record</h2>
+    <dl class="stats">
+      <div><dt>Games</dt><dd id="stat-games">0</dd></div>
+      <div><dt>Win rate</dt><dd id="stat-wins">0%</dd></div>
+      <div><dt>Best tile, this size</dt><dd id="stat-best-tile">—</dd></div>
+    </dl>
+  </section>
+
+  <section class="panel" aria-labelledby="keys-heading">
+    <h2 id="keys-heading">Controls</h2>
+    <dl class="keys">
+      <div><dt><kbd>&larr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd></dt><dd>Slide tiles</dd></div>
+      <div><dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Slide tiles</dd></div>
+      <div><dt><kbd>H</kbd><kbd>J</kbd><kbd>K</kbd><kbd>L</kbd></dt><dd>Slide tiles</dd></div>
+      <div><dt><kbd>U</kbd> or <kbd>Ctrl</kbd>+<kbd>Z</kbd></dt><dd>Take back a move</dd></div>
+      <div><dt><kbd>R</kbd></dt><dd>New game</dd></div>
+      <div><dt>Swipe</dt><dd>Slide tiles on a touchscreen</dd></div>
+    </dl>
+  </section>
+
+  <section class="panel" aria-labelledby="about-heading">
+    <h2 id="about-heading">About this game</h2>
+    <p>
+      gridshift is a modified and extended version of
+      <a href="https://github.com/gabrielecirulli/2048" rel="noopener">2048</a>,
+      originally created by Gabriele Cirulli and released under the MIT licence.
+      The rules and the merge model are his; the engine, renderer, accessibility
+      layer, test suite and everything listed in
+      <a href="./CHANGELOG.md">CHANGELOG.md</a> are new work in this repository.
+      See <a href="./LICENSE">LICENSE</a> for the full notice.
+    </p>
+  </section>
+</div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
