@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests on Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run tests
+        run: node --test "test/**/*.test.js"
+
+  checks:
+    name: Static checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate the web app manifest
+        run: node -e "JSON.parse(require('fs').readFileSync('manifest.webmanifest','utf8'))"
+      - name: Check that every file the service worker caches exists
+        run: |
+          node -e "
+          const fs = require('fs');
+          const sw = fs.readFileSync('sw.js', 'utf8');
+          const list = sw.slice(sw.indexOf('const SHELL'), sw.indexOf('];'));
+          const paths = [...list.matchAll(/'\.\/([^']+)'/g)].map(m => m[1]);
+          const missing = paths.filter(p => !fs.existsSync(p));
+          if (missing.length) { console.error('Missing from the repo:', missing); process.exit(1); }
+          console.log('Service worker shell verified:', paths.length, 'files');
+          "
