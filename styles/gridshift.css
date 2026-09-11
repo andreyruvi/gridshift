@@ -1,0 +1,382 @@
+/*
+ * gridshift
+ *
+ * No web fonts: upstream shipped three weights of Clear Sans in four formats,
+ * roughly 400 KB, to draw about a dozen numbers. A system stack with tabular
+ * figures renders the same board with nothing to download.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  --bg: #eef1f5;
+  --panel: #ffffff;
+  --board: #cfd6e0;
+  --cell-bg: #dee3ea;
+  --ink: #161c25;
+  --ink-2: #4d5766;
+  --ink-3: #7b8697;
+  --rule: #d3d9e2;
+  --accent: #1f6f63;
+  --accent-ink: #ffffff;
+  --focus: #1f6f63;
+  --notice-bg: #f6eedd;
+  --notice-ink: #7a5c16;
+
+  --gap: 10px;
+  --radius: 6px;
+  --n: 4;
+  --cell: 0px;
+
+  --tile-2:    #e8edf3; --tile-2-ink:    #3a4453;
+  --tile-4:    #dbe5ee; --tile-4-ink:    #33404f;
+  --tile-8:    #a8d8cf; --tile-8-ink:    #123a34;
+  --tile-16:   #79c5b7; --tile-16-ink:   #0d332d;
+  --tile-32:   #46ab9b; --tile-32-ink:   #04241f;
+  --tile-64:   #2f9c8a; --tile-64-ink:   #ffffff;
+  --tile-128:  #e8c477; --tile-128-ink:  #3b2c0b;
+  --tile-256:  #e0a34a; --tile-256-ink:  #2f2207;
+  --tile-512:  #d4823a; --tile-512-ink:  #ffffff;
+  --tile-1024: #c76242; --tile-1024-ink: #ffffff;
+  --tile-2048: #b34a5a; --tile-2048-ink: #ffffff;
+  --tile-high: #6f4b8e; --tile-high-ink: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1219;
+    --panel: #151c26;
+    --board: #1c2532;
+    --cell-bg: #222c3a;
+    --ink: #e6ebf2;
+    --ink-2: #a8b3c2;
+    --ink-3: #788494;
+    --rule: #27313f;
+    --accent: #2f9c8a;
+    --accent-ink: #04241f;
+    --focus: #63c7b5;
+    --notice-bg: #2a2316;
+    --notice-ink: #dcb96e;
+
+    --tile-2:    #2b3543; --tile-2-ink:    #c3ccd9;
+    --tile-4:    #35414f; --tile-4-ink:    #d6dee8;
+    --tile-8:    #26564e; --tile-8-ink:    #b9e6dc;
+    --tile-16:   #2c7466; --tile-16-ink:   #d6f2ea;
+    --tile-32:   #2f9c8a; --tile-32-ink:   #04241f;
+    --tile-64:   #46b8a3; --tile-64-ink:   #04241f;
+    --tile-128:  #9a7526; --tile-128-ink:  #f7e8c4;
+    --tile-256:  #c08b30; --tile-256-ink:  #241905;
+    --tile-512:  #d4823a; --tile-512-ink:  #241505;
+    --tile-1024: #c76242; --tile-1024-ink: #ffffff;
+    --tile-2048: #b34a5a; --tile-2048-ink: #ffffff;
+    --tile-high: #8a63a8; --tile-high-ink: #ffffff;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.shell {
+  max-width: 560px;
+  margin: 0 auto;
+  padding-inline: 16px;
+  padding-block: 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 10px 16px;
+  z-index: 10;
+}
+.skip:focus { left: 8px; top: 8px; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* masthead ---------------------------------------------------------------- */
+
+.masthead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  margin: 0;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  font-weight: 650;
+}
+
+.tagline { margin: 2px 0 0; color: var(--ink-3); font-size: 14px; }
+
+.readouts { display: flex; gap: 8px; }
+
+.readout {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  min-width: 72px;
+  text-align: right;
+}
+
+.readout-key {
+  display: block;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.readout-value {
+  display: block;
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+/* toolbar ----------------------------------------------------------------- */
+
+.toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.field { display: flex; flex-direction: column; gap: 4px; }
+
+.field label {
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+select, .btn {
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.seed {
+  margin: 0 0 8px auto;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.notice {
+  margin: 0;
+  padding: 10px 14px;
+  background: var(--notice-bg);
+  color: var(--notice-ink);
+  border-radius: var(--radius);
+  font-size: 13.5px;
+}
+
+/* board ------------------------------------------------------------------- */
+
+.board-wrap { position: relative; }
+
+.board {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  max-width: 100%;
+  padding: var(--gap);
+  background: var(--board);
+  border-radius: calc(var(--radius) + 4px);
+  touch-action: none;
+}
+
+.cells, .tiles {
+  position: absolute;
+  inset: var(--gap);
+}
+
+.cells {
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+  grid-template-rows: repeat(var(--n), 1fr);
+  gap: var(--gap);
+}
+
+.cell { background: var(--cell-bg); border-radius: var(--radius); }
+
+.tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--cell);
+  height: var(--cell);
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius);
+  background: var(--tile-2);
+  color: var(--tile-2-ink);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  transform: translate(
+    calc(var(--x) * (var(--cell) + var(--gap))),
+    calc(var(--y) * (var(--cell) + var(--gap)))
+  );
+  transition: transform 120ms ease-out;
+  will-change: transform;
+}
+
+.tile-value {
+  /* Shrink the label as the board grows and the numbers get longer. */
+  font-size: clamp(13px, calc(var(--cell) * 0.42), 40px);
+}
+
+.tile[data-value="2"]    { background: var(--tile-2);    color: var(--tile-2-ink); }
+.tile[data-value="4"]    { background: var(--tile-4);    color: var(--tile-4-ink); }
+.tile[data-value="8"]    { background: var(--tile-8);    color: var(--tile-8-ink); }
+.tile[data-value="16"]   { background: var(--tile-16);   color: var(--tile-16-ink); }
+.tile[data-value="32"]   { background: var(--tile-32);   color: var(--tile-32-ink); }
+.tile[data-value="64"]   { background: var(--tile-64);   color: var(--tile-64-ink); }
+.tile[data-value="128"]  { background: var(--tile-128);  color: var(--tile-128-ink); }
+.tile[data-value="256"]  { background: var(--tile-256);  color: var(--tile-256-ink); }
+.tile[data-value="512"]  { background: var(--tile-512);  color: var(--tile-512-ink); }
+.tile[data-value="1024"] { background: var(--tile-1024); color: var(--tile-1024-ink); font-size: 0.88em; }
+.tile[data-value="2048"] { background: var(--tile-2048); color: var(--tile-2048-ink); font-size: 0.88em; }
+.tile[data-value="4096"],
+.tile[data-value="8192"],
+.tile[data-value="huge"] { background: var(--tile-high); color: var(--tile-high-ink); font-size: 0.8em; }
+
+.tile.is-new { animation: appear 140ms ease-out; }
+.tile.is-merged { animation: pop 140ms ease-out; }
+.tile.is-retiring { z-index: -1; }
+
+@keyframes appear {
+  from { transform: translate(calc(var(--x) * (var(--cell) + var(--gap))), calc(var(--y) * (var(--cell) + var(--gap)))) scale(0.4); opacity: 0; }
+}
+
+@keyframes pop {
+  50% { transform: translate(calc(var(--x) * (var(--cell) + var(--gap))), calc(var(--y) * (var(--cell) + var(--gap)))) scale(1.12); }
+}
+
+/* overlay ----------------------------------------------------------------- */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: color-mix(in srgb, var(--board) 88%, transparent);
+  border-radius: calc(var(--radius) + 4px);
+  backdrop-filter: blur(2px);
+}
+
+.overlay[hidden] { display: none; }
+
+.overlay-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  text-align: center;
+  max-width: 320px;
+}
+
+.overlay-card h2 { margin: 0 0 6px; font-size: 22px; }
+.overlay-card p { margin: 0 0 16px; color: var(--ink-2); font-size: 14.5px; }
+.overlay-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+/* panels ------------------------------------------------------------------ */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+
+.panel h2 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+
+.panel p { margin: 0; font-size: 14px; color: var(--ink-2); }
+.panel a { color: var(--accent); }
+
+.stats, .keys { margin: 0; display: grid; gap: 10px; }
+.stats { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.stats dt, .keys dt { font-size: 12px; color: var(--ink-3); margin: 0; }
+.stats dd { margin: 2px 0 0; font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.keys div { display: flex; align-items: baseline; gap: 12px; justify-content: space-between; }
+.keys dd { margin: 0; font-size: 14px; color: var(--ink-2); }
+
+kbd {
+  display: inline-block;
+  font: inherit;
+  font-size: 12px;
+  padding: 1px 6px;
+  border: 1px solid var(--rule);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--bg);
+  margin-right: 2px;
+}
+
+@media (max-width: 420px) {
+  h1 { font-size: 26px; }
+  .readout { min-width: 62px; padding: 5px 10px; }
+  .readout-value { font-size: 17px; }
+  .seed { margin-left: 0; width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile { transition: none; }
+  .tile.is-new, .tile.is-merged { animation: none; }
+}
