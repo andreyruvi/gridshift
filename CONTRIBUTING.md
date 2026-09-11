@@ -18,7 +18,7 @@ not work: browsers refuse ES modules over `file://`.
 ## Tests
 
 ```bash
-node --test "test/**/*.test.js"
+node --test test/*.test.js
 ```
 
 Node 20 or newer. The suite uses only `node:test` and `node:assert`.

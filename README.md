@@ -99,7 +99,7 @@ persistence is lost.
 ## Development
 
 ```bash
-node --test "test/**/*.test.js"   # 54 tests, Node 20+
+node --test test/*.test.js   # 54 tests, Node 20+
 ```
 
 The suite uses only `node:test` and `node:assert`. There are no dependencies to
